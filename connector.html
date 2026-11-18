@@ -25,43 +25,17 @@ TrelloPowerUp.initialize({
     });
   },
 
-  // Бейдж на развороте карточки — по клику открывает форму редактирования
-  'card-detail-badges': function (t, options) {
-    return getEstimate(t).then(function (estimate) {
-      return [{
-        title: 'Оценка времени',
-        text: estimate ? estimate + ' ч' : 'Задать оценку',
-        icon: 'https://cdn-icons-png.flaticon.com/128/2088/2088617.png',
-        callback: function (t) {
-          return t.popup({
-            title: 'Оценка времени на задачу',
-            url: './estimate-form.html',
-            height: 140
-          });
-        }
-      }];
-    });
-  },
-
-  // Суммарная оценка по всем карточкам доски (бейдж на самой доске)
-  'board-badges': function (t, options) {
-    return t.cards('id').then(function (cards) {
-      return Promise.all(
-        cards.map(function (card) {
-          return t.get(card.id, 'shared', ESTIMATE_KEY);
-        })
-      ).then(function (estimates) {
-        var total = estimates.reduce(function (sum, e) {
-          var n = parseFloat(e);
-          return sum + (isNaN(n) ? 0 : n);
-        }, 0);
-        if (!total) return [];
-        return [{
-          text: 'Σ ' + total + 'ч',
-          icon: 'https://cdn-icons-png.flaticon.com/128/2088/2088617.png'
-        }];
-      });
-    });
+  // Раздел на развороте карточки — значение оценки редактируется прямо на месте
+  'card-back-section': function (t, options) {
+    return {
+      title: 'Оценка времени',
+      icon: 'https://cdn-icons-png.flaticon.com/128/2088/2088617.png',
+      content: {
+        type: 'iframe',
+        url: t.signUrl('./estimate-section.html'),
+        height: 50
+      }
+    };
   }
 });
 </script>

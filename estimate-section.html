@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Оценка времени</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: #172b4d;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 4px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .row:hover {
+      background: #091e4214;
+    }
+    .label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #44546f;
+    }
+    .value {
+      font-weight: 600;
+    }
+    .placeholder {
+      font-weight: 400;
+      color: #44546f;
+    }
+    input {
+      width: 70px;
+      text-align: right;
+      font-size: 14px;
+      font-family: inherit;
+      border: 2px solid #388bff;
+      border-radius: 3px;
+      padding: 2px 6px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="row" id="row">
+    <span class="label">⏳ Оценка</span>
+    <span class="value placeholder" id="display">—</span>
+  </div>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script>
+    var t = TrelloPowerUp.iframe();
+    var ESTIMATE_KEY = 'estimate';
+
+    var row = document.getElementById('row');
+    var display = document.getElementById('display');
+    var currentValue = '';
+
+    function renderDisplay() {
+      if (currentValue) {
+        display.textContent = currentValue + ' ч';
+        display.classList.remove('placeholder');
+      } else {
+        display.textContent = 'Задать';
+        display.classList.add('placeholder');
+      }
+    }
+
+    function loadValue() {
+      return t.get('card', 'shared', ESTIMATE_KEY).then(function (value) {
+        currentValue = value || '';
+        renderDisplay();
+      });
+    }
+
+    function startEditing() {
+      var input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.step = '0.5';
+      input.value = currentValue;
+      display.replaceWith(input);
+      input.focus();
+      input.select();
+
+      function finishEditing(save) {
+        var newValue = input.value.trim();
+        input.replaceWith(display);
+        if (save && newValue !== currentValue) {
+          currentValue = newValue;
+          renderDisplay();
+          if (newValue) {
+            t.set('card', 'shared', ESTIMATE_KEY, newValue);
+          } else {
+            t.remove('card', 'shared', ESTIMATE_KEY);
+          }
+        } else {
+          renderDisplay();
+        }
+      }
+
+      input.addEventListener('blur', function () {
+        finishEditing(true);
+      });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          input.blur();
+        } else if (e.key === 'Escape') {
+          finishEditing(false);
+        }
+      });
+    }
+
+    row.addEventListener('click', function () {
+      if (row.querySelector('input')) return;
+      startEditing();
+    });
+
+    loadValue().then(function () {
+      t.sizeTo('#row');
+    });
+  </script>
+</body>
+</html>
