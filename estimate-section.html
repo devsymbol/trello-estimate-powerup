@@ -18,6 +18,8 @@
       padding: 6px 4px;
       cursor: pointer;
       border-radius: 3px;
+      box-sizing: border-box;
+      min-height: 32px;
     }
     .row:hover {
       background: #091e4214;
@@ -30,6 +32,8 @@
     }
     .value {
       font-weight: 600;
+      line-height: 20px;
+      border-bottom: 2px solid transparent;
     }
     .placeholder {
       font-weight: 400;
@@ -39,10 +43,17 @@
       width: 70px;
       text-align: right;
       font-size: 14px;
+      font-weight: 600;
       font-family: inherit;
-      border: 2px solid #388bff;
-      border-radius: 3px;
-      padding: 2px 6px;
+      color: #172b4d;
+      box-sizing: border-box;
+      border: none;
+      border-bottom: 2px solid #388bff;
+      border-radius: 0;
+      padding: 0;
+      margin: 0;
+      line-height: 20px;
+      background: transparent;
       outline: none;
     }
   </style>
